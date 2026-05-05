@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext.jsx';
 
 const formatPrice = (price) => (price === 0 ? 'Free to Play' : `${price} грн`);
+const getReleaseYear = (releaseDate) => new Date(releaseDate).getFullYear();
 
 function GameCard({ game }) {
   const navigate = useNavigate();
@@ -35,9 +36,10 @@ function GameCard({ game }) {
         </div>
 
         <div className="game-card__meta">
-          <span>Rating {game.rating}</span>
+          <span>★ {game.rating}/10</span>
           <strong>{formatPrice(game.price)}</strong>
         </div>
+        <p className="game-card__release">Реліз: {getReleaseYear(game.releaseDate)}</p>
 
         <button
           className={isSaved ? 'button button--saved' : 'button'}

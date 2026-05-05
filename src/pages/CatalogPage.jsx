@@ -11,12 +11,19 @@ function CatalogPage() {
   const [sortBy, setSortBy] = useState('');
 
   const genres = useMemo(() => [...new Set(games.map((game) => game.genre))].sort(), []);
+  const hasActiveFilters = Boolean(query || selectedGenre !== 'All' || sortBy);
 
   const visibleGames = useMemo(() => {
     const foundGames = searchGames(games, query);
     const filteredGames = filterByGenre(foundGames, selectedGenre);
     return sortGames(filteredGames, sortBy);
   }, [query, selectedGenre, sortBy]);
+
+  const handleResetFilters = () => {
+    setQuery('');
+    setSelectedGenre('All');
+    setSortBy('');
+  };
 
   return (
     <section className="page">
@@ -35,8 +42,10 @@ function CatalogPage() {
           genres={genres}
           selectedGenre={selectedGenre}
           sortBy={sortBy}
+          hasActiveFilters={hasActiveFilters}
           onGenreChange={setSelectedGenre}
           onSortChange={setSortBy}
+          onReset={handleResetFilters}
         />
       </div>
 

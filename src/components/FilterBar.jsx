@@ -1,4 +1,12 @@
-function FilterBar({ genres, selectedGenre, sortBy, onGenreChange, onSortChange }) {
+function FilterBar({
+  genres,
+  selectedGenre,
+  sortBy,
+  hasActiveFilters,
+  onGenreChange,
+  onSortChange,
+  onReset,
+}) {
   return (
     <div className="filters">
       <label className="control-group">
@@ -30,6 +38,15 @@ function FilterBar({ genres, selectedGenre, sortBy, onGenreChange, onSortChange 
           <option value="date">За датою виходу</option>
         </select>
       </label>
+
+      <button
+        className="button button--secondary filter-reset"
+        type="button"
+        onClick={onReset}
+        disabled={!hasActiveFilters}
+      >
+        Скинути
+      </button>
     </div>
   );
 }
