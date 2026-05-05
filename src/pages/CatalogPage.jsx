@@ -49,6 +49,13 @@ function CatalogPage() {
         />
       </div>
 
+      <div className="catalog-summary">
+        <span>
+          Показано {visibleGames.length} з {games.length} ігор
+        </span>
+        {hasActiveFilters && <strong>Список відфільтровано</strong>}
+      </div>
+
       {visibleGames.length > 0 ? (
         <div className="game-grid">
           {visibleGames.map((game) => (
