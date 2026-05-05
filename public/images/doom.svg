@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#2b0905"/><stop offset="1" stop-color="#f05a28"/></linearGradient></defs>
+  <rect width="960" height="540" fill="url(#g)"/>
+  <path d="M120 420 470 70l370 350z" fill="#0c1218" opacity=".55"/>
+  <text x="64" y="314" fill="#ffffff" font-family="Arial, sans-serif" font-size="92" font-weight="900">DOOM</text>
+  <text x="68" y="382" fill="#ffd166" font-family="Arial, sans-serif" font-size="44">Eternal Shooter</text>
+</svg>

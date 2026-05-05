@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#083344"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+  <rect width="960" height="540" fill="url(#g)"/>
+  <path d="M120 370c110-95 235-98 360-60s250 22 360-82v155H120z" fill="#0f172a" opacity=".55"/>
+  <text x="64" y="300" fill="#ffffff" font-family="Arial, sans-serif" font-size="82" font-weight="900">FORZA</text>
+  <text x="68" y="368" fill="#beee11" font-family="Arial, sans-serif" font-size="42">Horizon 5</text>
+</svg>

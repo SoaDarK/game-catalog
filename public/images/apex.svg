@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#111827"/><stop offset="1" stop-color="#d90429"/></linearGradient></defs>
+  <rect width="960" height="540" fill="url(#g)"/>
+  <path d="m480 75 250 390H230z" fill="none" stroke="#ffffff" stroke-width="28" opacity=".35"/>
+  <text x="64" y="306" fill="#ffffff" font-family="Arial, sans-serif" font-size="90" font-weight="900">APEX</text>
+  <text x="68" y="374" fill="#66c0f4" font-family="Arial, sans-serif" font-size="42">Legends Shooter</text>
+</svg>
