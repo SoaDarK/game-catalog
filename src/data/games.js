@@ -125,4 +125,18 @@ export const games = [
     developer: 'Blizzard Entertainment',
     requirements: { os: 'Windows 7', ram: '4GB', gpu: 'GeForce GT 650M' },
   },
+  {
+    id: 10,
+    title: 'Valorant',
+    genre: 'Shooter',
+    rating: 10.0,
+    price: 0,
+    releaseDate: '2020-06-02',
+    image: '/images/valorant.svg',
+    screenshots: ['/images/valorant.svg', '/images/apex.svg', '/images/doom.svg'],
+    description:
+      'Це безкоштовний тактичний шутер від першої особи (FPS) 5х5, розроблений Riot Games та випущений у 2020 році. Гра поєднує точну стрілянину з унікальними здібностями персонажів (агентів). Мета - виграти 13 раундів, встановлюючи або знешкоджуючи "Spike" (бомбу). Гра доступна на ПК, PlayStation 5 та Xbox Series X/S.',
+    developer: 'Riot Games',
+    requirements: { os: 'Windows 10/11', ram: '8GB', gpu: 'GeForce GT 650M' },
+  },
 ];
