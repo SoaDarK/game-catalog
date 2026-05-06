@@ -11,7 +11,7 @@ function WishlistPage() {
       <div className="page-heading">
         <p className="eyebrow">Saved games</p>
         <h1>Wishlist</h1>
-        <p>Ігри зберігаються у localStorage і залишаються після перезавантаження сторінки.</p>
+        <p>Тут зібрані усі ваші улюблені ігри.</p>
       </div>
 
       {wishlist.length > 0 ? (

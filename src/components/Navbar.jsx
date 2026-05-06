@@ -25,6 +25,12 @@ function Navbar() {
             {wishlistCount}
           </span>
         </NavLink>
+        <NavLink
+          to="/manage-games"
+          className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+        >
+          Керування
+        </NavLink>
         {isAuthenticated ? (
           <div className="nav-user">
             <span>{currentUser.firstName}</span>

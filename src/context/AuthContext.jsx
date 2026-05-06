@@ -1,7 +1,7 @@
 import { createContext, useContext, useMemo, useState } from 'react';
+import { deleteUser, loginUser, registerUser } from '../services/usersApi.js';
 
 const AuthContext = createContext(null);
-const USERS_KEY = 'game-catalog-users';
 const CURRENT_USER_KEY = 'game-catalog-current-user';
 
 const readFromStorage = (key, fallbackValue) => {
@@ -14,15 +14,9 @@ const readFromStorage = (key, fallbackValue) => {
 };
 
 export function AuthProvider({ children }) {
-  const [users, setUsers] = useState(() => readFromStorage(USERS_KEY, []));
   const [currentUser, setCurrentUser] = useState(() => readFromStorage(CURRENT_USER_KEY, null));
 
   const value = useMemo(() => {
-    const persistUsers = (nextUsers) => {
-      setUsers(nextUsers);
-      localStorage.setItem(USERS_KEY, JSON.stringify(nextUsers));
-    };
-
     const persistCurrentUser = (user) => {
       setCurrentUser(user);
 
@@ -34,56 +28,50 @@ export function AuthProvider({ children }) {
       localStorage.removeItem(CURRENT_USER_KEY);
     };
 
-    const register = ({ firstName, lastName, email, password }) => {
-      const normalizedEmail = email.trim().toLowerCase();
-      const exists = users.some((user) => user.email === normalizedEmail);
+    const register = async (form) => {
+      try {
+        const user = await registerUser({
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          password: form.password,
+        });
+        persistCurrentUser(user);
 
-      if (exists) {
-        return { ok: false, message: 'Користувач з такою поштою вже існує.' };
+        return { ok: true };
+      } catch (error) {
+        return { ok: false, message: error.message };
       }
-
-      const newUser = {
-        id: Date.now(),
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        email: normalizedEmail,
-        password,
-      };
-      const publicUser = {
-        id: newUser.id,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        email: newUser.email,
-      };
-
-      persistUsers([...users, newUser]);
-      persistCurrentUser(publicUser);
-
-      return { ok: true };
     };
 
-    const login = ({ email, password }) => {
-      const normalizedEmail = email.trim().toLowerCase();
-      const foundUser = users.find(
-        (user) => user.email === normalizedEmail && user.password === password,
-      );
+    const login = async (credentials) => {
+      try {
+        const user = await loginUser(credentials);
+        persistCurrentUser(user);
 
-      if (!foundUser) {
-        return { ok: false, message: 'Невірна електронна пошта або пароль.' };
+        return { ok: true };
+      } catch (error) {
+        return { ok: false, message: error.message };
       }
-
-      persistCurrentUser({
-        id: foundUser.id,
-        firstName: foundUser.firstName,
-        lastName: foundUser.lastName,
-        email: foundUser.email,
-      });
-
-      return { ok: true };
     };
 
     const logout = () => {
       persistCurrentUser(null);
+    };
+
+    const deleteAccount = async () => {
+      if (!currentUser?.id) {
+        return { ok: false, message: 'Немає активного користувача.' };
+      }
+
+      try {
+        await deleteUser(currentUser.id);
+        persistCurrentUser(null);
+
+        return { ok: true };
+      } catch (error) {
+        return { ok: false, message: error.message };
+      }
     };
 
     return {
@@ -92,8 +80,9 @@ export function AuthProvider({ children }) {
       register,
       login,
       logout,
+      deleteAccount,
     };
-  }, [currentUser, users]);
+  }, [currentUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext.jsx';
-import { games } from '../data/games.js';
+import { fetchGame, fetchGames } from '../services/gamesApi.js';
 
 const formatPrice = (price) => (price === 0 ? 'Free to Play' : `${price} грн`);
 
@@ -8,14 +9,50 @@ function GamePage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const game = games.find((item) => item.id === Number(id));
+  const [game, setGame] = useState(null);
+  const [relatedGames, setRelatedGames] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [apiError, setApiError] = useState('');
   const { canUseWishlist, isInWishlist, toggleWishlist } = useWishlist();
+
+  useEffect(() => {
+    const loadGame = async () => {
+      setIsLoading(true);
+      setApiError('');
+
+      try {
+        const loadedGame = await fetchGame(id);
+        const loadedGames = await fetchGames();
+        const gamesInSameGenre = loadedGames
+          .filter(
+            (candidate) =>
+              candidate.genre === loadedGame.genre && String(candidate.id) !== String(loadedGame.id),
+          )
+          .slice(0, 3);
+
+        setGame(loadedGame);
+        setRelatedGames(gamesInSameGenre);
+      } catch (error) {
+        setApiError(`Не вдалося завантажити гру з API: ${error.message}`);
+        setGame(null);
+        setRelatedGames([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadGame();
+  }, [id]);
+
+  if (isLoading) {
+    return <section className="page empty-state">Завантаження гри з бази даних...</section>;
+  }
 
   if (!game) {
     return (
       <section className="page empty-state">
         <h1>Гру не знайдено</h1>
-        <p>Можливо, цей запис буде доступний після підключення API.</p>
+        <p>{apiError || 'Можливо, такого запису немає в базі даних.'}</p>
         <Link className="button button--link" to="/">
           Повернутися до каталогу
         </Link>
@@ -47,11 +84,24 @@ function GamePage() {
       <div className="details-layout">
         <div>
           <img className="details-cover" src={game.image} alt={game.title} />
-          <div className="screenshots">
-            {game.screenshots.map((screenshot) => (
-              <img key={screenshot} src={screenshot} alt={`${game.title} screenshot`} />
-            ))}
-          </div>
+          {relatedGames.length > 0 && (
+            <section className="related-games" aria-labelledby="related-games-title">
+              <h2 id="related-games-title">Схожі ігри</h2>
+              <div className="related-games__grid">
+                {relatedGames.map((relatedGame) => (
+                  <Link
+                    className="related-game"
+                    key={relatedGame.id}
+                    to={`/game/${relatedGame.id}`}
+                    aria-label={`Відкрити ${relatedGame.title}`}
+                  >
+                    <img src={relatedGame.image} alt={relatedGame.title} />
+                    <span>{relatedGame.title}</span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
 
         <article className="details-panel">

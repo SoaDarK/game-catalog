@@ -38,7 +38,7 @@ const validateForm = (form, mode) => {
 };
 
 function AuthPage() {
-  const { currentUser, isAuthenticated, login, logout, register } = useAuth();
+  const { currentUser, deleteAccount, isAuthenticated, login, logout, register } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [mode, setMode] = useState('login');
@@ -63,7 +63,7 @@ function AuthPage() {
     setSubmitMessage('');
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const validationErrors = validateForm(form, mode);
@@ -74,7 +74,7 @@ function AuthPage() {
       return;
     }
 
-    const result = isRegisterMode ? register(form) : login(form);
+    const result = isRegisterMode ? await register(form) : await login(form);
 
     if (!result.ok) {
       setSubmitMessage(result.message);
@@ -82,6 +82,17 @@ function AuthPage() {
     }
 
     navigate(redirectPath, { replace: true });
+  };
+
+  const handleDeleteAccount = async () => {
+    const result = await deleteAccount();
+
+    if (!result.ok) {
+      setSubmitMessage(result.message);
+      return;
+    }
+
+    navigate('/', { replace: true });
   };
 
   if (isAuthenticated) {
@@ -100,7 +111,11 @@ function AuthPage() {
             <button className="button button--danger" type="button" onClick={logout}>
               Вийти
             </button>
+            <button className="button button--danger" type="button" onClick={handleDeleteAccount}>
+              Видалити акаунт
+            </button>
           </div>
+          {submitMessage && <div className="form-message">{submitMessage}</div>}
         </div>
       </section>
     );
@@ -142,6 +157,7 @@ function AuthPage() {
                   className="input"
                   type="text"
                   name="firstName"
+                  aria-label="Ім'я"
                   value={form.firstName}
                   onChange={handleChange}
                   autoComplete="given-name"
@@ -155,6 +171,7 @@ function AuthPage() {
                   className="input"
                   type="text"
                   name="lastName"
+                  aria-label="Прізвище"
                   value={form.lastName}
                   onChange={handleChange}
                   autoComplete="family-name"
@@ -170,6 +187,7 @@ function AuthPage() {
               className="input"
               type="email"
               name="email"
+              aria-label="Електронна пошта"
               value={form.email}
               onChange={handleChange}
               autoComplete="email"
@@ -183,6 +201,7 @@ function AuthPage() {
               className="input"
               type="password"
               name="password"
+              aria-label="Пароль"
               value={form.password}
               onChange={handleChange}
               autoComplete={isRegisterMode ? 'new-password' : 'current-password'}

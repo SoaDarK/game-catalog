@@ -1,77 +1,67 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useAuth } from './AuthContext.jsx';
+import { addWishlistItem, deleteWishlistItem, fetchWishlist } from '../services/wishlistApi.js';
 
 const WishlistContext = createContext(null);
-const getStorageKey = (email) => `game-catalog-wishlist-${email}`;
-
-const readStoredWishlist = (email) => {
-  if (!email) {
-    return [];
-  }
-
-  try {
-    const storedValue = localStorage.getItem(getStorageKey(email));
-    return storedValue ? JSON.parse(storedValue) : [];
-  } catch {
-    return [];
-  }
-};
 
 export function WishlistProvider({ children }) {
   const { currentUser, isAuthenticated } = useAuth();
-  const [wishlistState, setWishlistState] = useState(() => ({
-    email: currentUser?.email ?? null,
-    items: readStoredWishlist(currentUser?.email),
-  }));
-  const wishlist = wishlistState.items;
+  const [wishlist, setWishlist] = useState([]);
 
   useEffect(() => {
-    setWishlistState({
-      email: currentUser?.email ?? null,
-      items: readStoredWishlist(currentUser?.email),
-    });
-  }, [currentUser?.email]);
+    const loadWishlist = async () => {
+      if (!currentUser?.id) {
+        setWishlist([]);
+        return;
+      }
 
-  useEffect(() => {
-    if (currentUser?.email && wishlistState.email === currentUser.email) {
-      localStorage.setItem(getStorageKey(currentUser.email), JSON.stringify(wishlist));
-    }
-  }, [currentUser?.email, wishlist, wishlistState.email]);
+      try {
+        const loadedWishlist = await fetchWishlist(currentUser.id);
+        setWishlist(loadedWishlist);
+      } catch {
+        setWishlist([]);
+      }
+    };
+
+    loadWishlist();
+  }, [currentUser?.id]);
 
   const value = useMemo(() => {
     const isInWishlist = (gameId) => wishlist.some((game) => game.id === gameId);
 
-    const addToWishlist = (game) => {
-      if (!isAuthenticated) {
-        return false;
-      }
-
-      setWishlistState((currentState) => {
-        if (currentState.items.some((item) => item.id === game.id)) {
-          return currentState;
-        }
-
-        return { ...currentState, items: [...currentState.items, game] };
-      });
-
-      return true;
-    };
-
-    const removeFromWishlist = (gameId) => {
-      setWishlistState((currentState) => ({
-        ...currentState,
-        items: currentState.items.filter((game) => game.id !== gameId),
-      }));
-    };
-
-    const toggleWishlist = (game) => {
-      if (!isAuthenticated) {
+    const addToWishlist = async (game) => {
+      if (!isAuthenticated || !currentUser?.id) {
         return false;
       }
 
       if (isInWishlist(game.id)) {
-        removeFromWishlist(game.id);
         return true;
+      }
+
+      const savedGame = await addWishlistItem(currentUser.id, game.id);
+      setWishlist((currentWishlist) => [...currentWishlist, savedGame]);
+
+      return true;
+    };
+
+    const removeFromWishlist = async (gameId) => {
+      if (!currentUser?.id) {
+        return false;
+      }
+
+      await deleteWishlistItem(currentUser.id, gameId);
+      setWishlist((currentWishlist) => currentWishlist.filter((game) => game.id !== gameId));
+
+      return true;
+    };
+
+    const toggleWishlist = async (game) => {
+      if (!isAuthenticated || !currentUser?.id) {
+        return false;
+      }
+
+      if (isInWishlist(game.id)) {
+        return removeFromWishlist(game.id);
       }
 
       return addToWishlist(game);
@@ -86,7 +76,7 @@ export function WishlistProvider({ children }) {
       removeFromWishlist,
       toggleWishlist,
     };
-  }, [isAuthenticated, wishlist]);
+  }, [currentUser?.id, isAuthenticated, wishlist]);
 
   return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;
 }

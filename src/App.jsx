@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import AuthPage from './pages/AuthPage.jsx';
 import CatalogPage from './pages/CatalogPage.jsx';
 import GamePage from './pages/GamePage.jsx';
+import ManageGamesPage from './pages/ManageGamesPage.jsx';
 import WishlistPage from './pages/WishlistPage.jsx';
 
 function App() {
@@ -15,6 +16,14 @@ function App() {
           <Route path="/" element={<CatalogPage />} />
           <Route path="/game/:id" element={<GamePage />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route
+            path="/manage-games"
+            element={
+              <ProtectedRoute>
+                <ManageGamesPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/wishlist"
             element={
